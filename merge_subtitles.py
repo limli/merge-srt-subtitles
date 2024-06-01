@@ -4,32 +4,28 @@ import srt  # for srt format handling
 import glob  # for unix style filename matching
 import sys  # input arguments
 import getopt  # to raise error in case of incorrect arguments
-
+import argparse
 
 def main(argv):
     # Parse arguments
-    primary_language = ''
-    secondary_language = ''
-    try:
-        opts, args = getopt.getopt(
-            argv, "hp:s:", ["primary-language=", "secondary-language="])
-    except getopt.GetoptError:
-        print ('merge_subtitles.py -p <primary_language>'
-               '-s <secondary_language>')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            print ('merge_subtitles.py -p <primary_language>'
-                   ' -s <secondary_language>')
-            sys.exit()
-        elif opt in ("-p", "--primary-language"):
-            primary_language = arg
-        elif opt in ("-s", "--secondary-language"):
-            secondary_language = arg
+    parser = argparse.ArgumentParser(
+        description='merge subtitles',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '-p',
+        help='primary language',
+        required=True)
+    parser.add_argument(
+        '-s',
+        help='secondary language',
+        required=True)
+    args = parser.parse_args()
+    primary_language = args.p
+    secondary_language = args.s
 
     # Read files and convert to list
-    primary_path = glob.glob('./*.' + primary_language + '.srt')[0]
-    secondary_path = glob.glob('./*.' + secondary_language + '.srt')[0]
+    primary_path = primary_language
+    secondary_path = secondary_language
     primary_file = open(primary_path, 'r', errors='ignore')
     primary_text = primary_file.read()
     primary_file.close()
@@ -43,7 +39,7 @@ def main(argv):
 
     # Make primary yellow
     for s in subtitles_primary:
-        s.content = '<font color="#ffff54">' + s.content + '</font>'
+        s.content = s.content
 
     # Place secondary on top
     for s in subtitles_secondary:
